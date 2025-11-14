@@ -1,122 +1,183 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MedNet Connect Jordan</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-image: url("./MedNet.jpg");
-            background-size: contain; /* Ensure the entire image fits within the viewport */
-            background-position: top center; /* Align the image to the top center */
-            background-repeat: no-repeat;
-            min-height: 100vh; /* Ensure the body covers the entire viewport height */
-        }
-
-        .container {
-            width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-            color: white; /* Assuming text needs to be white for visibility on the background */
-        }
-
-        /* Mobile styles */
-        @media (max-width: 600px) {
-            .container {
-                padding: 10px;
-            }
-
-            h1 {
-                font-size: 1.5em;
-            }
-
-            p {
-                font-size: 1em;
-            }
-        }
-
-        /* Tablet styles */
-        @media (min-width: 601px) and (max-width: 900px) {
-            .container {
-                padding: 15px;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-
-            p {
-                font-size: 1.2em;
-            }
-        }
-
-        /* Desktop styles */
-        @media (min-width: 901px) {
-            .container {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 2.5em;
-            }
-
-            p {
-                font-size: 1.5em;
-            }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <title>Quick Test Page</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; max-width:900px; margin:20px auto; line-height:1.4; }
+    h1{font-size:20px}
+    section{border:1px solid #ddd;padding:12px;border-radius:6px;margin:12px 0}
+    label,input,button,textarea{margin:6px 0;display:block}
+    .row{display:flex;gap:8px;align-items:center}
+    audio,video{display:block;margin-top:8px;max-width:100%}
+    pre{background:#f7f7f7;padding:8px;border-radius:4px;overflow:auto}
+  </style>
 </head>
 <body>
+  <h1>Quick HTML Test Toolkit</h1>
 
-<div class="container">
-    <!-- Content goes here -->
-</div>
+  <section>
+    <strong>1 — Browser & environment info</strong>
+    <pre id="env"></pre>
+  </section>
 
-<script type="text/javascript" charset="utf-8">
-  (function (g, e, n, es, ys) {
-    g['_genesysJs'] = e;
-    g[e] = g[e] || function () {
-      (g[e].q = g[e].q || []).push(arguments)
-    };
-    g[e].t = 1 * new Date();
-    g[e].c = es;
-    ys = document.createElement('script'); ys.async = 1; ys.src = n; ys.charset = 'utf-8'; document.head.appendChild(ys);
-  })(window, 'Genesys', 'https://apps.mypurecloud.de/genesys-bootstrap/genesys.min.js', {
-    environment: 'prod-euc1',
-    deploymentId: 'd2773ccb-76b4-46b3-8cdd-1d8e1c7a607b'
-  });
-</script>
+  <section>
+    <strong>2 — Simple network check (fetch / ping)</strong>
+    <div class="row">
+      <input id="pingUrl" placeholder="Enter URL to ping (e.g. https://example.com)" style="flex:1" />
+      <button id="btnPing">Ping / Fetch</button>
+    </div>
+    <pre id="pingResult">No test run yet.</pre>
+  </section>
+
+  <section>
+    <strong>3 — Audio playback test</strong>
+    <div class="row">
+      <input id="audioUrl" placeholder="Enter audio URL or leave blank to use sample" style="flex:1" />
+      <button id="btnPlay">Play</button>
+      <button id="btnStop">Stop</button>
+    </div>
+    <audio id="audioPlayer" controls></audio>
+  </section>
+
+  <section>
+    <strong>4 — Microphone test (live)</strong>
+    <div class="row">
+      <button id="btnStartMic">Start Microphone</button>
+      <button id="btnStopMic" disabled>Stop Microphone</button>
+      <button id="btnRecord" disabled>Start Recording</button>
+      <button id="btnStopRecord" disabled>Stop Recording</button>
+    </div>
+    <video id="localStream" autoplay playsinline muted style="height:120px;border:1px solid #ccc"></video>
+    <div>
+      <strong>Recorded clips:</strong>
+      <div id="clips"></div>
+    </div>
+  </section>
+
+  <section>
+    <strong>5 — Quick notes / usage</strong>
+    <ul>
+      <li>Save this file as <code>test.html</code> and open it in Chrome/Edge/Firefox.</li>
+      <li>Microphone features may require HTTPS or running on <code>http://localhost</code>.</li>
+      <li>For accurate audio codec tests you need a real call environment (SIP/WebRTC) — this page only checks devices and basic streaming/recording.</li>
+    </ul>
+  </section>
 
 <script>
-    // Function to detect if the device is mobile
-    function isMobileDevice() {
-        return /Mobi|Android|iPhone/i.test(navigator.userAgent);
+  // 1 - env
+  document.getElementById('env').textContent = [
+    'User agent: ' + navigator.userAgent,
+    'Platform: ' + navigator.platform,
+    'Online: ' + navigator.onLine,
+    'Language: ' + navigator.language,
+  ].join('\\n');
+
+  // 2 - ping/fetch
+  document.getElementById('btnPing').addEventListener('click', async () => {
+    const url = document.getElementById('pingUrl').value || 'https://api.ipify.org?format=json';
+    const out = document.getElementById('pingResult');
+    out.textContent = 'Pinging ' + url + ' ...';
+    const start = performance.now();
+    try {
+      const r = await fetch(url, {method:'GET', mode:'cors'});
+      const text = await r.text();
+      const elapsed = (performance.now() - start).toFixed(1);
+      out.textContent = 'Status: ' + r.status + ' (' + elapsed + ' ms)\\nResponse preview:\\n' + text.slice(0,1000);
+    } catch (err) {
+      out.textContent = 'Error: ' + err.message + '\\nNote: CORS or network may block the request.';
     }
+  });
 
-    // Apply specific styles or scripts based on the device
-    window.addEventListener('DOMContentLoaded', function() {
-        if (isMobileDevice()) {
-            document.body.style.backgroundColor = 'lightblue';
-            // Add any other mobile-specific functionality here
-        } else {
-            // Web-specific functionality
-            document.body.style.backgroundColor = '';
-        }
-    });
+  // 3 - audio playback
+  const audio = document.getElementById('audioPlayer');
+  document.getElementById('btnPlay').addEventListener('click', () => {
+    const url = document.getElementById('audioUrl').value.trim();
+    audio.src = url || 'https://www.w3schools.com/html/horse.mp3';
+    audio.play().catch(e => alert('Play error: ' + e.message));
+  });
+  document.getElementById('btnStop').addEventListener('click', () => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
 
-    // Example JavaScript to add mobile-specific functionality on resize
-    window.addEventListener('resize', function() {
-        if (isMobileDevice() || window.innerWidth < 600) {
-            document.body.style.backgroundColor = 'lightblue';
-        } else {
-            document.body.style.backgroundColor = '';
-        }
-    });
+  // 4 - mic live + recorder
+  let localStream = null;
+  let mediaRecorder = null;
+  let recordedBlobs = [];
+  const localVideo = document.getElementById('localStream');
+
+  async function startMic() {
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      // create an audio-only stream to play back (use audio element if not using <video>)
+      // but here we show use of stream: attach to audio element or video muted to confirm capture
+      const audioEl = document.createElement('audio');
+      audioEl.autoplay = true;
+      audioEl.muted = false;
+      audioEl.controls = true;
+      // attach to audioEl for live hear (may cause echo if speakers open)
+      audioEl.srcObject = localStream;
+      // also set a small video placeholder (muted) for compatibility
+      localVideo.srcObject = localStream;
+      document.getElementById('btnStopMic').disabled = false;
+      document.getElementById('btnRecord').disabled = false;
+    } catch (err) {
+      alert('Could not access microphone: ' + err.message + '\\nMake sure you allowed access and are on HTTPS or localhost.');
+    }
+  }
+
+  function stopMic() {
+    if (localStream) {
+      localStream.getTracks().forEach(t => t.stop());
+      localStream = null;
+    }
+    localVideo.srcObject = null;
+    document.getElementById('btnStopMic').disabled = true;
+    document.getElementById('btnRecord').disabled = true;
+    document.getElementById('btnStopRecord').disabled = true;
+  }
+
+  document.getElementById('btnStartMic').addEventListener('click', () => startMic());
+  document.getElementById('btnStopMic').addEventListener('click', () => stopMic());
+
+  document.getElementById('btnRecord').addEventListener('click', () => {
+    if (!localStream) return alert('Start microphone first.');
+    recordedBlobs = [];
+    try {
+      mediaRecorder = new MediaRecorder(localStream, { mimeType: 'audio/webm' });
+    } catch (e) {
+      try { mediaRecorder = new MediaRecorder(localStream); } catch (err) { return alert('MediaRecorder not supported: ' + err.message); }
+    }
+    mediaRecorder.ondataavailable = e => { if (e.data && e.data.size) recordedBlobs.push(e.data); };
+    mediaRecorder.onstop = saveRecording;
+    mediaRecorder.start();
+    document.getElementById('btnStopRecord').disabled = false;
+    document.getElementById('btnRecord').disabled = true;
+    console.log('Recording started');
+  });
+
+  document.getElementById('btnStopRecord').addEventListener('click', () => {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    document.getElementById('btnRecord').disabled = false;
+    document.getElementById('btnStopRecord').disabled = true;
+  });
+
+  function saveRecording() {
+    const blob = new Blob(recordedBlobs, { type: 'audio/webm' });
+    const url = window.URL.createObjectURL(blob);
+    const div = document.createElement('div');
+    const au = document.createElement('audio');
+    au.controls = true; au.src = url;
+    const dl = document.createElement('a');
+    dl.href = url; dl.download = 'recording.webm'; dl.textContent = 'Download';
+    div.appendChild(au);
+    div.appendChild(document.createTextNode(' '));
+    div.appendChild(dl);
+    document.getElementById('clips').appendChild(div);
+  }
+
 </script>
-
 </body>
 </html>

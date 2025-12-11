@@ -1,18 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sherwoods Property: Dubai Properties for Sale & Investment</title>
 
     <style>
-      #bg_img {
-        background-image: url("./sheerwood.jpg");
-      }
-    </style>
-  </head>
-  <body id="bg_img">
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url("./sheerwood.jpg");
+            background-size: contain; /* Ensure the entire image fits within the viewport */
+            background-position: top center; /* Align the image to the top center */
+            background-repeat: no-repeat;
+            min-height: 100vh; /* Ensure the body covers the entire viewport height */
+        }
 
+        .container {
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            color: white; /* Assuming text needs to be white for visibility on the background */
+        }
+
+        /* Mobile styles */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            p {
+                font-size: 1em;
+            }
+        }
+
+        /* Tablet styles */
+        @media (min-width: 601px) and (max-width: 900px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            p {
+                font-size: 1.2em;
+            }
+        }
+
+        /* Desktop styles */
+        @media (min-width: 901px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2.5em;
+            }
+
+            p {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Content goes here -->
+</div>
 
 <script type="text/javascript" charset="utf-8">
   (function (g, e, n, es, ys) {
@@ -30,5 +92,4 @@
 </script>
   </body>
 </html>
-
 
